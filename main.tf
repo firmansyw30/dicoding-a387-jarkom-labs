@@ -43,6 +43,17 @@ resource "aws_subnet" "subnet-a" {
   }
 }
 
+# subnet B
+resource "aws_subnet" "subnet-b" {
+  vpc_id            = aws_vpc.vpc-a.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ap-southeast-2b"
+
+  tags = {
+    Name = "Subnet-B"
+  }
+}
+
 # route table a
 resource "aws_route_table" "route-table-a" {
   vpc_id = aws_vpc.vpc-a.id
@@ -57,13 +68,35 @@ resource "aws_route_table" "route-table-a" {
   }
 }
 
+# route table a association
 resource "aws_route_table_association" "route-table-association-a" {
   subnet_id      = aws_subnet.subnet-a.id
   route_table_id = aws_route_table.route-table-a.id
 }
 
+resource "aws_route" "route-a" {
+  route_table_id            = aws_route_table.route-table-a.id
+  destination_cidr_block    = "0.0.0.0/0"
+  gateway_id                = aws_internet_gateway.vpc-a-igw.id
+}
+
+# route table b (private subnet)
+resource "aws_route_table" "route-table-b" {
+  vpc_id = aws_vpc.vpc-a.id
+
+  tags = {
+    Name = "Route-Table-B"
+  }
+
+  route {
+    cidr_block = "10.0.0.0/16"
+    gateway_id = null
+  }
+}
+
+
 # Security group
-resource "aws_security_group" "allow_ssh_http" {
+resource "aws_security_group" "web-server-sg" {
   name        = "web-server-sg"
   description = "Allow SSH, HTTP & HTTPS"
   vpc_id      = aws_vpc.vpc-a.id
@@ -71,38 +104,40 @@ resource "aws_security_group" "allow_ssh_http" {
   tags = {
     Name = "web-server-sg"
   }
-
-  #ssh port 22
-  ingress { 
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  #http port 80
-  ingress { 
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  #https port 443
-  ingress { 
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
+
+resource "aws_vpc_security_group_ingress_rule" "sg-http" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0"  # Allow HTTP from anywhere
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-app" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0"  # Allow from anywhere for app.js
+  from_port         = 8000
+  ip_protocol       = "tcp"
+  to_port           = 8000
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0"  # Allow SSH from anywhere
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-https" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS from anywhere
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
 
 # EC2 instance with Nginx and Node.js
 resource "aws_instance" "web_server" {
