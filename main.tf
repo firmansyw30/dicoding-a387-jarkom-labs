@@ -156,26 +156,26 @@ resource "aws_instance" "web_server" {
   }
 
   # User data for node js
-  user_data = <<-EOF
-  #!/bin/bash
-  echo "Starting user_data script" > /tmp/user_data.log
-  sudo apt-get update -y >> /tmp/user_data.log 2>&1
-  sudo apt-get install -y >> /tmp/user_data.log 2>&1
+  user_data = <<EOF
+#!/bin/bash
+echo "Starting user_data script" > /tmp/user_data.log
+sudo apt-get update -y >> /tmp/user_data.log 2>&1
+sudo apt-get install -y >> /tmp/user_data.log 2>&1
 
-  # Clone repository (ensure internet access and valid repo)
-  git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
-  cd dicoding-a387-jarkom-labs || exit 1  # Exit if directory not found
+# Clone repository (ensure internet access and valid repo)
+git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
+cd dicoding-a387-jarkom-labs || exit 1  # Exit if directory not found
 
-  # Install nvm and Node.js
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  nvm install 14.15.4
-  nvm use 14.15.4
+# Install nvm and Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm install 14.15.4
+nvm use 14.15.4
 
-  # Install dependencies and start Node.js application
-  npm install
-  npm run start
+# Install dependencies and start Node.js application
+npm install
+npm run start
 
   EOF
 }
