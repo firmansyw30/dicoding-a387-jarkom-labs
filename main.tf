@@ -17,6 +17,8 @@ provider "aws" {
 resource "aws_vpc" "vpc-a" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
+  enable_dns_support = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "VPC-A"
@@ -43,7 +45,7 @@ resource "aws_subnet" "subnet-a" {
   }
 }
 
-# subnet B
+# subnet B (private)
 resource "aws_subnet" "subnet-b" {
   vpc_id            = aws_vpc.vpc-a.id
   cidr_block        = "10.0.1.0/24"
@@ -131,7 +133,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
   to_port           = 22
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg-https" {
+resource "aws_vpc_security_group_egress_rule" "sg-https" {
   security_group_id = aws_security_group.web-server-sg.id
   cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS from anywhere
   from_port         = 443
@@ -155,28 +157,30 @@ resource "aws_instance" "web_server" {
 
   # User data for nginx & node js
   user_data = <<-EOF
-    #!/bin/bash
-    # Update and install necessary packages
-    sudo apt-get update -y
-    sudo apt-get install -y git nginx
+  #!/bin/bash
+  # Update and install necessary packages
+  sudo apt-get update -y
+  sudo apt-get install -y git nginx curl
 
-    # Start and enable nginx
-    sudo systemctl start nginx
-    sudo systemctl enable nginx
+  # Check, Start and enable nginx
+  sudo systemctl status nginx  # To check if it's properly installed
+  sudo systemctl start nginx
+  sudo systemctl enable nginx
 
-    # Clone repository
-    git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
-    cd dicoding-a387-jarkom-labs
+  # Clone repository (ensure internet access and valid repo)
+  git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
+  cd dicoding-a387-jarkom-labs || exit 1  # Exit if directory not found
 
-    # Install nvm and Node.js
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    nvm install v14.15.4
+  # Install nvm and Node.js
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  nvm install 14.15.4
+  nvm use 14.15.4
 
-    # Install dependencies and start Node.js application
-    sudo npm install
-    sudo npm run start
+  # Install dependencies and start Node.js application
+  npm install
+  npm run start
 
   EOF
 }
