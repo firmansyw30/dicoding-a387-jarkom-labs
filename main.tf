@@ -155,17 +155,12 @@ resource "aws_instance" "web_server" {
     Name = "Test-Web-Server-Instance-Firmansyw30"
   }
 
-  # User data for nginx & node js
+  # User data for node js
   user_data = <<-EOF
   #!/bin/bash
-  # Update and install necessary packages
-  sudo apt-get update -y
-  sudo apt-get install -y git nginx curl
-
-  # Check, Start and enable nginx
-  sudo systemctl status nginx  # To check if it's properly installed
-  sudo systemctl start nginx
-  sudo systemctl enable nginx
+  echo "Starting user_data script" > /tmp/user_data.log
+  sudo apt-get update -y >> /tmp/user_data.log 2>&1
+  sudo apt-get install -y >> /tmp/user_data.log 2>&1
 
   # Clone repository (ensure internet access and valid repo)
   git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
