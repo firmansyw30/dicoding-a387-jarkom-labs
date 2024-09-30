@@ -13,7 +13,7 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-# vpc A
+# VPC A
 resource "aws_vpc" "vpc-a" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
@@ -25,7 +25,7 @@ resource "aws_vpc" "vpc-a" {
   }
 }
 
-# internet gateway
+# Internet gateway
 resource "aws_internet_gateway" "vpc-a-igw" {
   vpc_id = aws_vpc.vpc-a.id
 
@@ -34,7 +34,7 @@ resource "aws_internet_gateway" "vpc-a-igw" {
   }
 }
 
-# subnet A
+# Subnet A
 resource "aws_subnet" "subnet-a" {
   vpc_id     = aws_vpc.vpc-a.id
   cidr_block = "10.0.0.0/24"
@@ -45,7 +45,7 @@ resource "aws_subnet" "subnet-a" {
   }
 }
 
-# subnet B (private)
+# Subnet B (private)
 resource "aws_subnet" "subnet-b" {
   vpc_id            = aws_vpc.vpc-a.id
   cidr_block        = "10.0.1.0/24"
@@ -56,7 +56,7 @@ resource "aws_subnet" "subnet-b" {
   }
 }
 
-# route table a
+# Route table A
 resource "aws_route_table" "route-table-a" {
   vpc_id = aws_vpc.vpc-a.id
 
@@ -70,7 +70,7 @@ resource "aws_route_table" "route-table-a" {
   }
 }
 
-# route table a association
+# Route table A association
 resource "aws_route_table_association" "route-table-association-a" {
   subnet_id      = aws_subnet.subnet-a.id
   route_table_id = aws_route_table.route-table-a.id
@@ -82,7 +82,7 @@ resource "aws_route" "route-a" {
   gateway_id                = aws_internet_gateway.vpc-a-igw.id
 }
 
-# route table b (private subnet)
+# Route table B (private subnet)
 resource "aws_route_table" "route-table-b" {
   vpc_id = aws_vpc.vpc-a.id
 
@@ -111,7 +111,7 @@ resource "aws_security_group" "web-server-sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "sg-http" {
   security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0"  # Allow HTTP from anywhere
+  cidr_ipv4         = "0.0.0.0/0"  # Allow ingress HTTP from anywhere
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
@@ -119,7 +119,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg-http" {
 
 resource "aws_vpc_security_group_ingress_rule" "sg-app" {
   security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0"  # Allow from anywhere for app.js
+  cidr_ipv4         = "0.0.0.0/0"  # Allow ingress from anywhere for app.js
   from_port         = 8000
   ip_protocol       = "tcp"
   to_port           = 8000
@@ -127,7 +127,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg-app" {
 
 resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
   security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0"  # Allow SSH from anywhere
+  cidr_ipv4         = "0.0.0.0/0"  # Allow SSH ingress from anywhere
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
@@ -135,20 +135,20 @@ resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
 
 resource "aws_vpc_security_group_egress_rule" "sg-https" {
   security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS from anywhere
+  cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS egress from anywhere
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
 }
 
 
-# EC2 instance with Nginx and Node.js
+# EC2 instance
 resource "aws_instance" "web_server" {
   ami           = "ami-0e84539e536a327dc"
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.subnet-a.id
   associate_public_ip_address = true
-  key_name      = "sample-key-pair-firman" # ensure this key pair available
+  key_name      = "sample-key-pair-firman" # Ensure this key pair available
   vpc_security_group_ids = [aws_security_group.web-server-sg.id]  # attach security group
 
   tags = {
@@ -160,24 +160,20 @@ resource "aws_instance" "web_server" {
 #!/bin/bash
 echo "Starting user_data script" > /tmp/user_data.log
 sudo apt-get update -y >> /tmp/user_data.log 2>&1
-sudo apt-get install -y >> /tmp/user_data.log 2>&1
-
+# Install nginx, certbot
+sudo apt-get install nginx python3-certbot-nginx -y >> /tmp/user_data.log 2>&1
 # Clone repository (ensure internet access and valid repo)
 git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
 cd dicoding-a387-jarkom-labs || exit 1  # Exit if directory not found
-
-# Install nvm and Node.js
+# Install nvm and node.js
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install 14.15.4
 nvm use 14.15.4
-
-# Install dependencies and start Node.js application
+# Install node js dependencies
 npm install
-npm run start
-
-  EOF
+EOF
 }
 
 output "instance_ip" {
