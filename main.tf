@@ -155,7 +155,7 @@ resource "aws_instance" "web_server" {
     Name = "Test-Web-Server-Instance-Firmansyw30"
   }
 
-  # User data for node js
+  # User data for node js, fix it later
   user_data = <<EOF
 #!/bin/bash
 echo "Starting user_data script" > /tmp/user_data.log

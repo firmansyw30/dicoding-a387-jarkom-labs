@@ -1,10 +1,10 @@
 {
   "name": "nodeapp",
   "version": "1.0.0",
-  "description": "",
+  "description": "simple-test-express-api | firmansyw30",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "pm2 start app.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "pm2": "^5.4.2"
   }
 }
