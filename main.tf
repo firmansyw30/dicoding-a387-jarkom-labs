@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-southeast-2"
+  region = "ap-southeast-3"
 }
 
 # VPC A
@@ -38,7 +38,7 @@ resource "aws_internet_gateway" "vpc-a-igw" {
 resource "aws_subnet" "subnet-a" {
   vpc_id     = aws_vpc.vpc-a.id
   cidr_block = "10.0.0.0/24"
-  availability_zone = "ap-southeast-2a"
+  availability_zone = "ap-southeast-3a"
 
   tags = {
     Name = "Subnet-A"
@@ -49,7 +49,7 @@ resource "aws_subnet" "subnet-a" {
 resource "aws_subnet" "subnet-b" {
   vpc_id            = aws_vpc.vpc-a.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-southeast-2b"
+  availability_zone = "ap-southeast-3b"
 
   tags = {
     Name = "Subnet-B"
