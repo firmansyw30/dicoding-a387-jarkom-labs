@@ -8,6 +8,7 @@ sudo apt-get update -y >> $LOG_FILE 2>&1
 sudo apt-get install -y nginx python3-certbot-nginx git curl >> $LOG_FILE 2>&1
 
 # Clone repository (ensure internet access and valid repo)
+cd /home/ubuntu
 git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git >> $LOG_FILE 2>&1
 cd dicoding-a387-jarkom-labs || { echo "Directory not found" >> $LOG_FILE; exit 1; }
 
