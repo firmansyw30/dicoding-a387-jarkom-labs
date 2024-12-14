@@ -117,14 +117,6 @@ resource "aws_vpc_security_group_ingress_rule" "sg-http" {
   to_port           = 80
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg-app" {
-  security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0"  # Allow ingress from anywhere for app.js
-  from_port         = 8000
-  ip_protocol       = "tcp"
-  to_port           = 8000
-}
-
 resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
   security_group_id = aws_security_group.web-server-sg.id
   cidr_ipv4         = "0.0.0.0/0"  # Allow SSH ingress from anywhere
@@ -133,14 +125,27 @@ resource "aws_vpc_security_group_ingress_rule" "sg-ssh" {
   to_port           = 22
 }
 
-resource "aws_vpc_security_group_egress_rule" "sg-https" {
+resource "aws_vpc_security_group_ingress_rule" "sg-https" {
   security_group_id = aws_security_group.web-server-sg.id
-  cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS egress from anywhere
+  cidr_ipv4         = "0.0.0.0/0" # Allow HTTPS ingress from anywhere
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
 }
 
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-express" {
+  security_group_id = aws_security_group.web-server-sg.id
+  cidr_ipv4         = "0.0.0.0/0" # Security Group to access the app.js
+  from_port         = 8000
+  ip_protocol       = "tcp"
+  to_port           = 8000
+}
 
 # EC2 instance
 resource "aws_instance" "web_server" {
@@ -148,7 +153,7 @@ resource "aws_instance" "web_server" {
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.subnet-a.id
   associate_public_ip_address = true
-  key_name      = "sample-key-pair-firman" # Ensure this key pair available
+  key_name      = "sample-key-pair-firman" # Ensure this key pair available (created on console)
   vpc_security_group_ids = [aws_security_group.web-server-sg.id]  # attach security group
 
   tags = {
@@ -156,24 +161,7 @@ resource "aws_instance" "web_server" {
   }
 
   # User data for node js, fix it later
-  user_data = <<EOF
-    #!/bin/bash
-    echo "Starting user_data script" > /tmp/user_data.log
-    sudo apt-get update -y >> /tmp/user_data.log 2>&1
-    sudo apt-get install -y nginx python3-certbot-nginx >> /tmp/user_data.log 2>&1
-    sudo npm install -g pm2 >> /tmp/user_data.log 2>&1
-    git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git
-    cd dicoding-a387-jarkom-labs || exit 1  # Exit if directory not found
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    nvm install 14.15.4
-    nvm use 14.15.4
-    npm install
-    pm2 start app.js --name "simple-express-app-firmansyw30"  # Replace with your main app file
-    pm2 startup >> /tmp/user_data.log 2>&1
-    pm2 save >> /tmp/user_data.log 2>&1
-  EOF
+  user_data     =  "${file("startup.sh")}"
 }
 
 output "instance_ip" {
