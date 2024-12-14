@@ -150,7 +150,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg-express" {
 # EC2 instance
 resource "aws_instance" "web_server" {
   ami           = "ami-012972a9e728b3b9c"
-  instance_type = "t2.micro"
+  instance_type = "t3.nano"
   subnet_id     = aws_subnet.subnet-a.id
   associate_public_ip_address = true
   key_name      = "sample-key-pair-firman" # Ensure this key pair available (created on console)
@@ -161,7 +161,7 @@ resource "aws_instance" "web_server" {
   }
 
   # User data for node js, fix it later
-  user_data     =  "${file("startup.sh")}"
+  user_data = file("startup.sh")
 }
 
 output "instance_ip" {
