@@ -149,7 +149,7 @@ resource "aws_vpc_security_group_ingress_rule" "sg-express" {
 
 # EC2 instance
 resource "aws_instance" "web_server" {
-  ami           = "ami-0e84539e536a327dc"
+  ami           = "ami-012972a9e728b3b9c"
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.subnet-a.id
   associate_public_ip_address = true
