@@ -13,7 +13,7 @@ git clone https://github.com/firmansyw30/dicoding-a387-jarkom-labs.git >> $LOG_F
 cd dicoding-a387-jarkom-labs || { echo "Directory not found" >> $LOG_FILE; exit 1; }
 
 # Install Node.js (using NodeSource for simplicity)
-curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash - >> $LOG_FILE 2>&1
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - >> $LOG_FILE 2>&1
 sudo apt-get install -y nodejs >> $LOG_FILE 2>&1
 
 # Install necessary library
