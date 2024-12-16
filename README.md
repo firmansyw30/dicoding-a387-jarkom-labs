@@ -127,7 +127,7 @@ Note the `hostname` value.
 
 Paste the values of the "hostname" in the `server_name` section
 
-[Example](![Screenshot 2024-12-16 230144 (ss subdomain)](https://github.com/user-attachments/assets/84183416-1c3e-4859-99f0-ae795df36cf5)
+[Screenshot 2024-12-16 230144 (ss subdomain)](https://github.com/user-attachments/assets/84183416-1c3e-4859-99f0-ae795df36cf5)
 
 
 3. Save & Restart Nginx
