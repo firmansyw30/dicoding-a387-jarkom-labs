@@ -52,7 +52,7 @@ If stuck, refer to this link for setup environment variables
 
 [Video Reference](https://youtu.be/2iC7R32C-EQ?si=iWYEG9nktjKuYK3K)
 
-Also, create the "key pair" first before deployment to easily connect to EC2 instance
+Also, create the `Keypair` first before deployment to easily connect to EC2 instance
 
 [Reference to Create EC2 Keypair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html)
 
@@ -120,12 +120,12 @@ Note the `hostname` value.
 [Example](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:b077990a643a0ccfdb8478a557e4fe5420220322102040.jpeg)
 
 
-2. Add the "hostname" values to nginx by edit the file "/etc/nginx/sites-available/default"
+2. Add the `hostname` values to nginx by edit the file `/etc/nginx/sites-available/default`
 ```bash
   sudo nano /etc/nginx/sites-available/default
 ```
 
-Paste the values of the "hostname" in the `server_name` section
+Paste the values of the `hostname` in the `server_name` section
 
 ![Screenshot 2024-12-16 230144 (ss subdomain)](https://github.com/user-attachments/assets/3e3a9018-395b-4ca2-b297-25c5d62cc14b)
 
@@ -144,7 +144,7 @@ Paste the values of the "hostname" in the `server_name` section
 
 ## Configuring TLS Certificate (optional)
 
-1. Connect to EC2 Instance using Instance Connect. Change the value of "<public IP EC2 instance>" with actual Public IP
+1. Connect to EC2 Instance using Instance Connect. Change the value of `<public IP EC2 instance>` with actual Public IP
 
 ```bash
 sudo certbot --nginx -d <yourdomain.com> -d <www.yourdomain.com>
