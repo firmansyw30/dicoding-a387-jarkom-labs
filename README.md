@@ -150,7 +150,7 @@ Paste the values of the `hostname` in the `server_name` section
 sudo certbot --nginx -d <yourdomain.com> -d <www.yourdomain.com>
 ```
 
-Replace the <yourdomain.com> and <www.yourdomain.com> with the actual value
+Replace the `<yourdomain.com>` and `<www.yourdomain.com>` with the actual value
 
 [Example](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:01def23cce20989fcaa3a696b987c66220220322105832.jpeg)
 
