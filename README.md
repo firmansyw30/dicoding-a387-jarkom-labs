@@ -110,7 +110,7 @@ Then add again the following value in the `location` block
 ```
 ## Setup subdomain dcdg.xyz (optional)
 
-1. Connect to EC2 Instance using Instance Connect. Change the value of "<public IP EC2 instance>" with actual Public IP
+1. Connect to EC2 Instance using Instance Connect. Change the value of `<public IP EC2 instance>` with actual Public IP from EC2
 
 ```bash
   curl -X POST -H "Content-type: application/json" -d "{ \"ip\": \"<public IP EC2 instance>\" }" "https://sub.dcdg.xyz/dns/records"
