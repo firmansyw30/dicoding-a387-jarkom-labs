@@ -80,7 +80,7 @@ Deploy with auto approve
 ```
 ## Setup Limit Access (Optional, best practices for prevent DDOS)
 
-1. Connect to EC2 Instance using Instance Connect then edit the file "/etc/nginx/sites-available/default" (if the node js still running, stop it first)
+1. Connect to EC2 Instance using Instance Connect or SSH then edit the file `/etc/nginx/sites-available/default` (if the node js still running, stop it first)
 
 ```bash
   sudo nano /etc/nginx/sites-available/default
